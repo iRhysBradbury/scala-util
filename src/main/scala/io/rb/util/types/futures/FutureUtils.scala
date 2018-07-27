@@ -26,12 +26,10 @@ object FutureUtils
     if (toProcess.isEmpty) {
       processed
     } else {
-      val futureToProcess = toProcess.head
-      val newlyProcessed = futureToProcess.recoverAsTry()
       successfulSequence(
         toProcess = toProcess.tail,
         processed = processed.flatMap { s: Seq[Either[Throwable, T]] =>
-          newlyProcessed.map(s ++ Seq(_))
+          toProcess.head.recoverAsTry().map(s ++ Seq(_))
         }
       )
     }

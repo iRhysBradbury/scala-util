@@ -19,10 +19,11 @@ class FutureUtilsTest
     "RichFuture" - {
 
       "recoverAsTry" - {
+
         "Right" in {
           val value = "value"
           val input = Future.successful(value)
-          val expected = Future.successful(Success(value))
+          val expected = Future.successful(Right(value))
           val actual = input.recoverAsTry()
 
           whenReady(
@@ -36,7 +37,7 @@ class FutureUtilsTest
         "Left" in {
           val exception = new Throwable
           val input = Future.failed(exception)
-          val expected = Future.successful(Failure(exception))
+          val expected = Future.successful(Left(exception))
           val actual = input.recoverAsTry()
 
           whenReady(
@@ -50,16 +51,20 @@ class FutureUtilsTest
     }
 
     "successfulSequence" in {
-      val i0 = "i0".toFuture()
-      val i1 = new Throwable("i1").toFuture()
-      val i2 = "i2".toFuture()
+      val i0v = "i0v"
+      val i1v = new Throwable("i1v")
+      val i2v = "i0v"
+
+      val i0 = i0v.toFuture()
+      val i1 = i1v.toFuture()
+      val i2 = i2v.toFuture()
 
       val input = Seq(i0, i1, i2)
       val expected = Future.successful(
         Seq(
-          Right(i0),
-          Left(i1),
-          Right(i2)
+          Right(i0v),
+          Left(i1v),
+          Right(i2v)
         )
       )
       val actual = FutureUtils.successfulSequence(input)

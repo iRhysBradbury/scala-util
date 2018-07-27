@@ -50,7 +50,7 @@ class TUtilsTest
         "Future.successful" in {
           val input = "value"
           val expected = Future.successful(input)
-          val actual = input.toEither()
+          val actual = input.toFuture()
 
           whenReady(
             for {
@@ -61,18 +61,19 @@ class TUtilsTest
         }
 
         "Future.failed" in {
-          val input: Any = new Throwable
-          val expected: Future[Any] = Future {
-            throw input()
+          val input = new Throwable
+          val expected = Future {
+            throw input
           }
           val actual = input.toFuture()
-
-          whenReady(
-            for {
-              e <- expected
-              a <- actual
-            } yield e shouldBe a[Throwable]
-          )(identity)
+          intercept[Throwable] {
+            whenReady(
+              for {
+                e <- expected
+                a <- actual
+              } yield ()
+            )(identity)
+          }
         }
       }
     }
